@@ -8,58 +8,38 @@ import java.util.List;
 
 import br.com.dals.dao.ContatoDao;
 import br.com.dals.modelo.Contato;
+import br.com.dals.modelo.Endereco;
 
 public class Main {
 
-public static void main(String[] args) throws ParseException {
-		
-		ContatoDao contatoDAO = new ContatoDao();
-		
-		//Inserindo contato novo
-		Contato novo = new Contato();
-		novo.setNome("Joao da Silva 3");
-		novo.setEndereco("Rua da sardinha 3");
-		novo.setEmail("jao3@hotmail.com");
-		novo.setDataNascimento(Date.valueOf(LocalDate.of(1989, Month.DECEMBER, 25)));
-		
-		contatoDAO.adicionaContato(novo);
-		//Mostrando contato de numero 2
-		//Contato contato = contatoDAO.pesquisaContatoById(2);
-		//MostraContao(contato);
-		
-		//Mostrando todos os contatos
-		MostraTodosOsContatos(contatoDAO.pesquisaAllContatos());
-		
-	}
+    public static void main(String[] args) throws ParseException {
 
-	private static void MostraTodosOsContatos(List<Contato> contatos) {
-		
-		System.out.println("Dados dos contatos:\n");
-		for(Contato contato : contatos){
-			System.out.println("ID: "+contato.getId());
-			System.out.println("Nome: "+contato.getNome());
-			System.out.println("E-mail: "+contato.getEmail());
-			System.out.println("Endere�o: "+contato.getEndereco());
-			System.out.println("Data de Nascimento: "+(Date)contato.getDataNascimento());
-			System.out.println();
-		}
-		
-	}
+	ContatoDao contatoDAO = new ContatoDao();
 
-	private static void MostraContao(Contato contato) {
+	Endereco endecero = new Endereco("Rua Bari", 92, "Jardim Europa", "Uberlândia", "Brasil");
 
-		if(contato != null){
-			
-			System.out.println("Dados do contato:\n");
-			System.out.println("ID: "+contato.getId());
-			System.out.println("Nome: "+contato.getNome());
-			System.out.println("E-mail: "+contato.getEmail());
-			System.out.println("Endere�o: "+contato.getEndereco());
-			System.out.println("Data de Nascimento: "+(Date)contato.getDataNascimento());
-			
-		}else{
-			System.out.println("N�o existe contato");
-		}
-		
-	}
+	// Inserindo contato novo
+	Contato novo = new Contato();
+	novo.setNome("Priscila Lourenço");
+	novo.setEndereco(endecero);
+	novo.setEmail("priscila.lo@gmail.com");
+	novo.setDataNascimento(Date.valueOf(LocalDate.of(1990, Month.JULY, 10)));
+
+	contatoDAO.adicionaContato(novo);
+	MostraTodosOsContatos(contatoDAO.pesquisaTodosContatos());
+
+    }
+
+    private static void MostraTodosOsContatos(List<Contato> contatos) {
+	System.out.println("Dados dos contatos:\n");
+	contatos.forEach(contato -> {
+	    System.out.println("ID: " + contato.getId());
+	    System.out.println("Nome: " + contato.getNome());
+	    System.out.println("E-mail: " + contato.getEmail());
+	    System.out.println("Endereço: " + contato.getEndereco());
+	    System.out.println("Data de Nascimento: " + contato.getDataNascimentoFormatada());
+	    System.out.println();
+	});
+    }
+
 }

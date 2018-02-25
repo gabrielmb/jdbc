@@ -4,15 +4,15 @@ create table tb_endereco(
     numero integer not null,
     bairro varchar(50) not null,
     cidade varchar(50) not null,
-    pais varchar(30) not null default 'BRASIL',
+    pais varchar(30) not null default 'Brasil',
     primary key (id)
 );
 
 create table tb_contato (
 	id integer auto_increment,
     id_endereco integer not null,
-    nome varchar(20) not null,
-    email varchar(30) not null,
+    nome varchar(50) not null,
+    email varchar(50) not null,
     data_nascimento date default null,
     primary key (id),
     foreign key (id_endereco) references tb_endereco(id)
