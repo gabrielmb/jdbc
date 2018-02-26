@@ -22,17 +22,17 @@ public class ContatoDao extends JdbcConnection {
     }
 
     public void adicionaContato(Contato contato) {
-	StringBuilder stringBuilderEndereco = new StringBuilder();
-	StringBuilder stringBuilderContato = new StringBuilder();
+	StringBuilder builderScriptAdicionaEndereco = new StringBuilder();
+	StringBuilder builderScriptAdicionaContato = new StringBuilder();
 
-	stringBuilderEndereco.append("insert into tb_endereco (logradouro,numero,bairro,cidade,pais) ");
-	stringBuilderEndereco.append(" values (?,?,?,?,?) ");
+	builderScriptAdicionaEndereco.append("insert into tb_endereco (logradouro,numero,bairro,cidade,pais) ");
+	builderScriptAdicionaEndereco.append(" values (?,?,?,?,?) ");
 
-	stringBuilderContato.append("insert into tb_contato (id_endereco,nome,email,data_nascimento) ");
-	stringBuilderContato.append(" values (?,?,?,?) ");
+	builderScriptAdicionaContato.append("insert into tb_contato (id_endereco,nome,email,data_nascimento) ");
+	builderScriptAdicionaContato.append(" values (?,?,?,?) ");
 
 	try {
-	    PreparedStatement statementEndereco = connection.prepareStatement(stringBuilderEndereco.toString(),
+	    PreparedStatement statementEndereco = connection.prepareStatement(builderScriptAdicionaEndereco.toString(),
 	            Statement.RETURN_GENERATED_KEYS);
 
 	    connection.setAutoCommit(false);
@@ -44,19 +44,24 @@ public class ContatoDao extends JdbcConnection {
 	    statementEndereco.setString(5, contato.getEndereco().getPais());
 
 	    statementEndereco.executeUpdate();
-	    ResultSet result = statementEndereco.getGeneratedKeys();
-	    if ( result.next() ) {
-		contato.getEndereco().setId(result.getLong(1));
+	    ResultSet resultEndereco = statementEndereco.getGeneratedKeys();
+	    if ( resultEndereco.next() ) {
+		contato.getEndereco().setId(resultEndereco.getLong(1));
 	    }
 
-	    PreparedStatement statementContato = connection.prepareStatement(stringBuilderContato.toString());
+	    PreparedStatement statementContato = connection.prepareStatement(builderScriptAdicionaContato.toString(),
+		    Statement.RETURN_GENERATED_KEYS);
 
 	    statementContato.setLong(1, contato.getEndereco().getId());
 	    statementContato.setString(2, contato.getNome());
 	    statementContato.setString(3, contato.getEmail());
 	    statementContato.setDate(4, contato.getDataNascimento());
 
-	    statementContato.execute();
+	    statementContato.executeUpdate();
+	    ResultSet resultContato = statementContato.getGeneratedKeys();
+	    if ( resultContato.next() ) {
+		contato.setId(resultContato.getLong(1));
+	    }
 
 	    connection.commit();
 	} catch ( SQLException e ) {
@@ -74,10 +79,10 @@ public class ContatoDao extends JdbcConnection {
 	
 	List<Contato> contatos = new ArrayList<>();
 	
-	StringBuilder builderFindContato = new StringBuilder(" select * from tb_contato ");
+	StringBuilder builderScriptBuscaContato = new StringBuilder(" select * from tb_contato ");
 	
 	try {
-	    PreparedStatement statement = connection.prepareStatement(builderFindContato.toString());
+	    PreparedStatement statement = connection.prepareStatement(builderScriptBuscaContato.toString());
 	    
 	    ResultSet result = statement.executeQuery();
 	    
@@ -102,9 +107,9 @@ public class ContatoDao extends JdbcConnection {
 	Endereco endereco = new Endereco();
 	
 	try {
-	    StringBuilder builderFindEndecero = new StringBuilder();
-	    builderFindEndecero.append(" select * from tb_endereco where id = ? ");
-	    PreparedStatement statement = connection.prepareStatement(builderFindEndecero.toString());
+	    StringBuilder builderScriptBuscaEndereco = new StringBuilder();
+	    builderScriptBuscaEndereco.append(" select * from tb_endereco where id = ? ");
+	    PreparedStatement statement = connection.prepareStatement(builderScriptBuscaEndereco.toString());
 	    
 	    statement.setLong(1, idEndereco);
 	    
@@ -123,6 +128,50 @@ public class ContatoDao extends JdbcConnection {
 	    LOOGER.error("Erro ContatoDao pesquisaEndereco. ERROR: "+e.getMessage());
 	}
 	return endereco;
+    }
+
+    public void atualizaContato(Contato contato) {
+	try {
+	    StringBuilder scriptAtualizaContato = new StringBuilder();
+	    StringBuilder scriptAtualizaEndereco = new StringBuilder();
+	    
+	    scriptAtualizaEndereco.append("update tb_endereco set logradouro = ?, numero = ?, bairro = ?, ");
+	    scriptAtualizaEndereco.append(" cidade = ?, pais = ? where id = ? ");
+	    
+	    scriptAtualizaContato.append("update tb_contato set nome = ?, email = ?, data_nascimento = ? where id = ? ");
+	    
+	    connection.setAutoCommit(false);
+	    
+	    PreparedStatement statementEndereco = connection.prepareStatement(scriptAtualizaEndereco.toString());
+	    
+	    statementEndereco.setString(1, contato.getEndereco().getLogradouro());
+	    statementEndereco.setInt(2, contato.getEndereco().getNumero());
+	    statementEndereco.setString(3, contato.getEndereco().getBairro());
+	    statementEndereco.setString(4, contato.getEndereco().getCidade());
+	    statementEndereco.setString(5, contato.getEndereco().getPais());
+	    statementEndereco.setLong(6, contato.getEndereco().getId());
+	    
+	    statementEndereco.executeUpdate();
+	    
+	    PreparedStatement statementContato = connection.prepareStatement(scriptAtualizaContato.toString());
+	    
+	    statementContato.setString(1, contato.getNome());
+	    statementContato.setString(2, contato.getEmail());
+	    statementContato.setDate(3, contato.getDataNascimento());
+	    statementContato.setLong(4, contato.getId());
+	    
+	    statementContato.executeUpdate();
+	    
+	    connection.commit();
+	    
+	} catch ( SQLException e ) {
+	    LOOGER.error("Erro ContatoDao atualizaContato. ERROR: "+e.getMessage());
+	    try {
+		connection.rollback();
+	    } catch ( SQLException e1 ) {
+		LOOGER.error("Erro ContatoDao atualizaContato rollBack. ERROR: "+e1.getMessage());
+	    }
+	}
     }
 
 }

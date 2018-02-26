@@ -19,13 +19,20 @@ public class Main {
 	Endereco endecero = new Endereco("Rua Bari", 92, "Jardim Europa", "Uberlândia", "Brasil");
 
 	// Inserindo contato novo
-	Contato novo = new Contato();
-	novo.setNome("Priscila Lourenço");
-	novo.setEndereco(endecero);
-	novo.setEmail("priscila.lo@gmail.com");
-	novo.setDataNascimento(Date.valueOf(LocalDate.of(1990, Month.JULY, 10)));
+	Contato contato = new Contato();
+	contato.setNome("Priscila Lourenço");
+	contato.setEndereco(endecero);
+	contato.setEmail("priscila.lo@gmail.com");
+	contato.setDataNascimento(Date.valueOf(LocalDate.of(1990, Month.JULY, 10)));
 
-	contatoDAO.adicionaContato(novo);
+	contatoDAO.adicionaContato(contato);
+	MostraTodosOsContatos(contatoDAO.pesquisaTodosContatos());
+	
+	contato.setEmail("piscila.eikemiguel@gmail.com");
+	contato.getEndereco().setLogradouro("Rua Alemanha");
+	
+	contatoDAO.atualizaContato(contato);
+	
 	MostraTodosOsContatos(contatoDAO.pesquisaTodosContatos());
 
     }
