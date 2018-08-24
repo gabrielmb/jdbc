@@ -1,15 +1,28 @@
-package br.com.dals.modelo;
+package br.jdbc.model;
 
-import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Contato {
-
+    
     private Long id;
     private String nome;
     private String email;
-    private Endereco endereco;
+    private Long endereco;
     private Date dataNascimento;
+
+    public Contato ( ) {
+
+    }
+
+    public Contato ( Long id, String nome, String email, Long endereco, Date dataNascimento) {
+	this.id = id;
+	this.nome = nome;
+	this.email = email;
+	this.endereco = endereco;
+	this.dataNascimento = dataNascimento;
+    }
+
 
     public Long getId() {
 	return id;
@@ -35,11 +48,11 @@ public class Contato {
 	this.email = email;
     }
 
-    public Endereco getEndereco() {
+    public Long getEndereco() {
 	return endereco;
     }
 
-    public void setEndereco(Endereco endereco) {
+    public void setEndereco(Long endereco) {
 	this.endereco = endereco;
     }
 
@@ -59,11 +72,10 @@ public class Contato {
     }
 
     @Override
-    public String toString() {
-	return "Contato [id=" + id + ", nome=" + nome + ", email=" + email + ", " + endereco.toString()
-	        + ", dataNascimento=" + dataNascimento + "]";
+    public String toString ( ) {
+
+	return "Contato [id=" + id + ", nome=" + nome + ", email=" + email + ", endereco=" + endereco
+			+ ", dataNascimento=" + dataNascimento + "]";
     }
-    
-    
 
 }

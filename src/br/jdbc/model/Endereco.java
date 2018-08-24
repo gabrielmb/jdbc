@@ -1,4 +1,4 @@
-package br.com.dals.modelo;
+package br.jdbc.model;
 
 public class Endereco {
 
@@ -12,7 +12,8 @@ public class Endereco {
     public Endereco() {
     }
 
-    public Endereco(String logradouro, Integer numero, String bairro, String cidade, String pais) {
+    public Endereco(Long id, String logradouro, Integer numero, String bairro, String cidade, String pais) {
+	this.id = id;
 	this.logradouro = logradouro;
 	this.numero = numero;
 	this.bairro = bairro;
