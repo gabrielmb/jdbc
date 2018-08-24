@@ -36,4 +36,12 @@ public class ContatoDTO {
 	this.endereco = endereco;
     }
 
+    @Override
+    public String toString ( ) {
+
+	return "ContatoDTO ["+ contato + ", " + endereco + "]";
+    }
+    
+    
+
 }

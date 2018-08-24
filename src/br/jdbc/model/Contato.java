@@ -1,6 +1,5 @@
 package br.jdbc.model;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Contato {
@@ -62,13 +61,6 @@ public class Contato {
 
     public void setDataNascimento(Date dataNascimento) {
 	this.dataNascimento = dataNascimento;
-    }
-    
-    public String getDataNascimentoFormatada() {
-	if(dataNascimento != null)
-	    return new SimpleDateFormat("dd/MM/yyyy").format(dataNascimento);
-	
-	return "";
     }
 
     @Override
