@@ -22,6 +22,11 @@ public class ContatoService {
 
 	return contatoRepository.save(contato);
     }
+
+    public void delete ( Long contatoId ) {
+
+	contatoRepository.delete(contatoId);
+    }
     
     
 

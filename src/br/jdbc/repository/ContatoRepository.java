@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.jdbc.dto.ContatoDTO;
 import br.jdbc.dto.ContatoResponse;
@@ -57,46 +58,66 @@ public class ContatoRepository {
     public ContatoResponse save ( ContatoDTO contatoDTO ) {
 
 	ContatoResponse result = new ContatoResponse( );
-	
+
 	final String sqlEndereco = "INSERT INTO endereco(logradouro, numero, bairro, cidade, pais) VALUES (?,?,?,?,?)";
 	final String sqlContato = "INSERT INTO contato(nome, email, endereco, dataNascimento) VALUES (?,?,?,?)";
-		 
-        KeyHolder holder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement(sqlEndereco, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, contatoDTO.getEndereco( ).getLogradouro( ));
-                ps.setInt(2, contatoDTO.getEndereco( ).getNumero( ));
-                ps.setString(3, contatoDTO.getEndereco( ).getBairro( ));
-                ps.setString(4, contatoDTO.getEndereco( ).getCidade( ));
-                ps.setString(5, contatoDTO.getEndereco( ).getPais( ));
-                return ps;
-            }
-        }, holder);
- 
-        long enderecoId = holder.getKey().longValue( );
-        contatoDTO.getEndereco( ).setId( enderecoId );
-        
-        holder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement(sqlContato, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, contatoDTO.getContato( ).getNome( ));
-                ps.setString(2, contatoDTO.getContato( ).getEmail( ));
-                ps.setLong(3, contatoDTO.getContato( ).getEndereco( ));
-                ps.setDate(4, new java.sql.Date(contatoDTO.getContato( ).getDataNascimento( ).getTime( )));
-                return ps;
-            }
-        }, holder);
- 
-        long contatoId = holder.getKey().longValue( );
-        contatoDTO.getContato( ).setId( contatoId );
-        
-        result.setContato( Arrays.asList( contatoDTO ) );
-        
-        return result;
+
+	KeyHolder holder = new GeneratedKeyHolder( );
+	jdbcTemplate.update( new PreparedStatementCreator( ) {
+
+	    @Override
+	    public PreparedStatement createPreparedStatement ( Connection connection ) throws SQLException {
+
+		PreparedStatement ps = connection.prepareStatement( sqlEndereco, Statement.RETURN_GENERATED_KEYS );
+		ps.setString( 1, contatoDTO.getEndereco( ).getLogradouro( ) );
+		ps.setInt( 2, contatoDTO.getEndereco( ).getNumero( ) );
+		ps.setString( 3, contatoDTO.getEndereco( ).getBairro( ) );
+		ps.setString( 4, contatoDTO.getEndereco( ).getCidade( ) );
+		ps.setString( 5, contatoDTO.getEndereco( ).getPais( ) );
+		return ps;
+	    }
+	}, holder );
+
+	long enderecoId = holder.getKey( ).longValue( );
+	contatoDTO.getEndereco( ).setId( enderecoId );
+
+	holder = new GeneratedKeyHolder( );
+	jdbcTemplate.update( new PreparedStatementCreator( ) {
+
+	    @Override
+	    public PreparedStatement createPreparedStatement ( Connection connection ) throws SQLException {
+
+		PreparedStatement ps = connection.prepareStatement( sqlContato, Statement.RETURN_GENERATED_KEYS );
+		ps.setString( 1, contatoDTO.getContato( ).getNome( ) );
+		ps.setString( 2, contatoDTO.getContato( ).getEmail( ) );
+		ps.setLong( 3, contatoDTO.getContato( ).getEndereco( ) );
+		ps.setDate( 4, new java.sql.Date( contatoDTO.getContato( ).getDataNascimento( ).getTime( ) ) );
+		return ps;
+	    }
+	}, holder );
+
+	long contatoId = holder.getKey( ).longValue( );
+	contatoDTO.getContato( ).setId( contatoId );
+
+	result.setContato( Arrays.asList( contatoDTO ) );
+
+	return result;
+    }
+
+    @Transactional
+    public void delete ( Long contatoId ) {
+
+	String sqlFindContato = "SELECT * FROM contato WHERE id = ?";
+	
+	String sqlDeleteContato = "DELETE FROM contato WHERE id = ?";
+	String sqlDeleteEndereco = "DELETE FROM endereco WHERE id = ?";
+
+	Contato contato = jdbcTemplate.queryForObject( sqlFindContato, new Object[] { contatoId.toString( ) }, 
+			new BeanPropertyRowMapper<>( Contato.class ) );
+	
+	jdbcTemplate.update( sqlDeleteContato, new Object[] {contato.getId( ).toString( )});
+	jdbcTemplate.update( sqlDeleteEndereco, new Object[] {contato.getEndereco( ).toString( )});
+	
     }
 
 }
